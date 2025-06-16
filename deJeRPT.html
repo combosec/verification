@@ -1,0 +1,145 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Advanced Rainbow CAPTCHA</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+      background: #f0f0f0;
+    }
+    canvas {
+      border-radius: 12px;
+      border: 2px solid #999;
+      margin-bottom: 10px;
+    }
+    input, button {
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      margin: 5px;
+      font-size: 16px;
+    }
+    button {
+      cursor: pointer;
+      background-color: #333;
+      color: white;
+    }
+    #message {
+      margin-top: 10px;
+      font-weight: bold;
+      color: green;
+      filter: blur(1px);
+      letter-spacing: 2px;
+      font-size: 18px;
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Rainbow CAPTCHA Verification</h2>
+  <canvas id="captchaCanvas" width="240" height="70"></canvas>
+  <br>
+  <input type="text" id="userInput" placeholder="Enter CAPTCHA">
+  <button onclick="checkCaptcha()">Submit</button>
+  <div id="message"></div>
+
+  <script>
+    let generatedString = '';
+
+    function generateRandomString(length = 6) {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+      let result = '';
+      for (let i = 0; i < length; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return result;
+    }
+
+    function drawCaptcha(text) {
+      const canvas = document.getElementById('captchaCanvas');
+      const ctx = canvas.getContext('2d');
+
+      // Rainbow gradient background
+      const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+      gradient.addColorStop(0, 'red');
+      gradient.addColorStop(0.2, 'orange');
+      gradient.addColorStop(0.4, 'yellow');
+      gradient.addColorStop(0.6, 'green');
+      gradient.addColorStop(0.8, 'blue');
+      gradient.addColorStop(1, 'violet');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // More obfuscation lines
+      for (let i = 0; i < 12; i++) {
+        ctx.strokeStyle = `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},0.3)`;
+        ctx.beginPath();
+        ctx.moveTo(Math.random() * canvas.width, Math.random() * canvas.height);
+        ctx.lineTo(Math.random() * canvas.width, Math.random() * canvas.height);
+        ctx.stroke();
+      }
+
+      // Background faint characters
+      const faintChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      ctx.font = '20px Arial';
+      for (let i = 0; i < 30; i++) {
+        ctx.fillStyle = `rgba(0, 0, 0, 0.05)`;
+        ctx.fillText(
+          faintChars.charAt(Math.floor(Math.random() * faintChars.length)),
+          Math.random() * canvas.width,
+          Math.random() * canvas.height
+        );
+      }
+
+      // Draw the actual CAPTCHA string
+      ctx.font = '32px Arial';
+      for (let i = 0; i < text.length; i++) {
+        const letter = text[i];
+        ctx.fillStyle = `rgb(${Math.floor(Math.random()*100)}, ${Math.floor(Math.random()*100)}, ${Math.floor(Math.random()*100)})`;
+        const angle = (Math.random() - 0.5) * 0.5;
+        ctx.save();
+        ctx.translate(30 + i * 30, 45);
+        ctx.rotate(angle);
+        ctx.fillText(letter, 0, 0);
+        ctx.restore();
+      }
+
+      // Increased noise dots
+      for (let i = 0; i < 150; i++) {
+        ctx.fillStyle = `rgba(0,0,0,${Math.random() * 0.3})`;
+        ctx.beginPath();
+        ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height, Math.random() * 1.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function checkCaptcha() {
+      const userInput = document.getElementById('userInput').value.trim();
+      const messageDiv = document.getElementById('message');
+
+      if (userInput === generatedString) {
+        messageDiv.innerHTML = 'Say MMQ0CB to the discord bot!';
+        messageDiv.style.filter = 'blur(0.5px) brightness(1.1)';
+      } else {
+        messageDiv.textContent = 'Try again.';
+        messageDiv.style.color = 'red';
+        messageDiv.style.filter = 'none';
+        generatedString = generateRandomString();
+        drawCaptcha(generatedString);
+      }
+    }
+
+    // On load
+    generatedString = generateRandomString();
+    drawCaptcha(generatedString);
+  </script>
+
+</body>
+</html>
+
+    
